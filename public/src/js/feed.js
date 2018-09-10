@@ -129,12 +129,17 @@ if ('indexedDB' in window) {
 form.addEventListener('submit', (event) => {
   event.preventDefault();
 
-  if(titleInput.value.trim() || locationInput.value.trim() === '') {
+  if(titleInput.value.trim() === '' || locationInput.value.trim() === '') {
     alert('Please enter valid data');
     return;
   }
   
   closeCreatePostModal();
 
-
+  if('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready
+      .then((sw) => {
+        sw.sync.register('sync-new-post');
+      })
+  }
 })
