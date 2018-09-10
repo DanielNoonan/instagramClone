@@ -126,6 +126,26 @@ if ('indexedDB' in window) {
     })
 }
 
+const sendData = () => {
+  fetch('https://instagramclonepwa.firebaseio.com/posts.json', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      id: new Date.toISOString(),
+      title: titleInput.value,
+      location: locationInput.value,
+      image: 'https://firebasestorage.googleapis.com/v0/b/instagramclonepwa.appspot.com/o/sf-boat.jpg?alt=media&token=a13175f8-c68e-455b-92f1-159e33dd4d0c'
+    })
+  })
+  .then((res) => {
+    console.log('Sent data', res);
+    updateUI();
+  })
+}
+
 form.addEventListener('submit', (event) => {
   event.preventDefault();
 
@@ -156,6 +176,8 @@ form.addEventListener('submit', (event) => {
           .catch((err) => {
             console.log(err);
           });
-      })
+      });
+  } else {
+    sendData();
   }
 })
