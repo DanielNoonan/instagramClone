@@ -14,7 +14,7 @@ const writeData = (st, data) => {
     return dbPromise
         .then((db) => {
             let tx = db.transaction(st, 'readwrite');
-            let store = tx.objectStore('posts');
+            let store = tx.objectStore(st);
             store.put(data);
             return tx.complete;
         });

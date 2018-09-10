@@ -181,3 +181,39 @@ self.addEventListener('fetch', function (event) {
 //     fetch(event.request)
 //   );
 // });
+
+self.addEventListener('sync', (event) => {
+  console.log('[Service Worker] Background Syncing');
+  if(event.tag === 'sync-new-posts') {
+    console.log('[Service Worker] Syncing new Post');
+    event.waitUntil(
+      readAllData('sync-posts',)
+      .then((data) => {
+        for(let dt of data) {
+          fetch('https://instagramclonepwa.firebaseio.com/posts.json', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            id: dt.id,
+            title: dt.title,
+            location: dt.location,
+            image: 'https://firebasestorage.googleapis.com/v0/b/instagramclonepwa.appspot.com/o/sf-boat.jpg?alt=media&token=a13175f8-c68e-455b-92f1-159e33dd4d0c'
+                })
+          })
+          .then((res) => {
+            console.log('Sent data', res);
+            if (res.ok) {
+              deleteItemFromData('sync-posts', dt.id); // Isn't working correctly!
+            }
+          })
+          .catch((err) => {
+            console.log('Error while sending data', err);
+          })
+        }
+      })
+    )
+  }
+});
