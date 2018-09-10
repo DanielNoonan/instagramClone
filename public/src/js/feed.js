@@ -129,12 +129,12 @@ if ('indexedDB' in window) {
 form.addEventListener('submit', (event) => {
   event.preventDefault();
 
-  if(titleInput.nodeValue.trim() || locationInput.nodeValue.trim() === '') {
+  if(titleInput.value.trim() || locationInput.value.trim() === '') {
     alert('Please enter valid data');
     return;
   }
   
   closeCreatePostModal();
 
-  
+
 })
