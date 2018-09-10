@@ -128,7 +128,7 @@ if ('indexedDB' in window) {
 
 //Fallback for browsers that don't support serviceWorker or SyncManager so they don't try adding post to IndexedDB and syncing. Instead the post data is sent directly to the firebase backend which will work fine if the user is online and will obviously fail if the user is offline.
 const sendData = () => {
-  fetch('https://instagramclonepwa.firebaseio.com/posts.json', {
+  fetch('https://us-central1-instagramclonepwa.cloudfunctions.net/storePostData', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
