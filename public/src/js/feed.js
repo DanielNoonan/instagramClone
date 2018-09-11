@@ -2,6 +2,9 @@ var shareImageButton = document.querySelector('#share-image-button');
 var createPostArea = document.querySelector('#create-post');
 var closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
 var sharedMomentsArea = document.querySelector('#shared-moments');
+let form = document.querySelector('form');
+let titleInput = document.querySelector('#title');
+let locationInput = document.querySelector('#location');
 
 function openCreatePostModal() {
   // createPostArea.style.display = 'block';
@@ -122,3 +125,60 @@ if ('indexedDB' in window) {
       }
     })
 }
+
+//Fallback for browsers that don't support serviceWorker or SyncManager so they don't try adding post to IndexedDB and syncing. Instead the post data is sent directly to the firebase backend which will work fine if the user is online and will obviously fail if the user is offline.
+const sendData = () => {
+  fetch('https://us-central1-instagramclonepwa.cloudfunctions.net/storePostData', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      id: new Date.toISOString(),
+      title: titleInput.value,
+      location: locationInput.value,
+      image: 'https://firebasestorage.googleapis.com/v0/b/instagramclonepwa.appspot.com/o/sf-boat.jpg?alt=media&token=a13175f8-c68e-455b-92f1-159e33dd4d0c'
+    })
+  })
+  .then((res) => {
+    console.log('Sent data', res);
+    updateUI();
+  })
+}
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  if(titleInput.value.trim() === '' || locationInput.value.trim() === '') {
+    alert('Please enter valid data');
+    return;
+  }
+  
+  closeCreatePostModal();
+
+  if('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready
+      .then((sw) => {
+        let post = {
+          id: new Date().toISOString(),
+          title: titleInput.value,
+          location: locationInput.value
+        };
+        writeData('sync-posts', post)
+          .then(() => {
+            return sw.sync.register('sync-new-posts');
+          })
+          .then(() => {
+            let snackbarContainer = document.querySelector('#confirmation-toast');
+            let data = {message: 'Your Post was saved for syncing!'};
+            snackbarContainer.MaterialSnackbar.showSnackbar(data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+  } else {
+    sendData();
+  }
+})
