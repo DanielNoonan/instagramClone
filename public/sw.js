@@ -220,3 +220,25 @@ self.addEventListener('sync', (event) => {
     )
   }
 });
+
+// Onclick events for notifications
+self.addEventListener('notificationclick', (event) => {
+  let notification = event.notification;
+  let action = event.action;
+
+  console.log(notification);
+
+  if (action === 'confirm') {
+    console.log('Confirm was chosen');
+    notification.close();
+  } else {
+    console.log(action);
+    notification.close();
+  }
+});
+
+// Listening for if the notification was simply dismissed/cleared without being interacted with. Useful to know for analytics data regarding how users are interacting with the app.
+self.addEventListener('notificicationclose', (event) => {
+  console.log('Notification was closed/dismissed: ', event);
+});
+

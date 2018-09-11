@@ -1,3 +1,5 @@
+
+
 //Open an indexDB 'database' and create an 'object store' in there.
 let dbPromise = idb.open('posts-store', 1, (db) => {
     if(!db.objectStoreNames.contains('posts')) {
