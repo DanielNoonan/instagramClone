@@ -38,10 +38,28 @@ window.addEventListener('beforeinstallprompt', function(event) {
 // }
 
 const displayConfirmNotification = () => {
-  let options = {
-    body: 'You successfully subscribed to our notification service'
-  };
-  new Notification('Successfully Subscribed!', options);
+  if ('serviceWorker' in navigator) {
+    let options = {
+      body: 'You successfully subscribed to our notification service',
+      icon: '/src/images/icons/app-icon-96x96.png',
+      image: '/src/images/sf-boat.jpg',
+      dir: 'ltr',
+      lang: 'en-US', // BCP 47 compliant language code
+      vibrate: [100, 50, 200],
+      badge: '/src/images/icons/app-icon-96x96.png',
+      tag: 'confirm-notification',
+      renotify: true,
+      actions: [
+        { action: 'confirm', title: 'Okay', icon: '/src/images/icons/app-icon-96x96.png' },
+        { action: 'cancel', title: 'Cancel', icon: '/src/images/icons/app-icon-96x96.png' }
+      ]
+    };
+
+    navigator.serviceWorker.ready
+      .then((swreg) => {
+        swreg.showNotification('Successfully subscribed [From SW]', options);
+      });
+  }
 }
 
 const askForNotificationPermission = () => {
