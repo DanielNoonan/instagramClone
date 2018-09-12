@@ -57,9 +57,53 @@ const displayConfirmNotification = () => {
 
     navigator.serviceWorker.ready
       .then((swreg) => {
-        swreg.showNotification('Successfully subscribed [From SW]', options);
+        swreg.showNotification('Successfully subscribed!', options);
       });
   }
+}
+
+const configurePushSub = () => {
+  if (!('serviceWoker' in navigator)) {
+    return;
+  }
+
+  let reg;
+  navigator.serviceWorker.ready
+    .then((swreg) => {
+      reg = swreg;
+      return swreg.pushManager.getSubscription();
+    })
+    .then((sub) => {
+      if (sub === null) {
+        // Create a new subscription
+        let vapidPublicKey = 'BOldvj-FCVW2AyEXuut2TRtIgzXoXzITel4H3K6WZ2-gdi28qDzHee0XVwIZlnAdInQl49_tGr88VKdN4iNlFvk';
+        let convertedVapidPublicKey = urlBase64ToUint8Array(vapidPublicKey);
+        return reg.pushManager.subscribe({
+          userVisibility: true,
+          applicationServerKey: convertedVapidPublicKey
+        });
+      } else {
+        // We have a subscription
+      }
+    })
+    .then((newSub) => {
+      return fetch('https://instagramclonepwa.firebaseio.com/subscriptions.json', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(newSub)
+      })
+    })
+    .then((res) => {
+      if (res.ok) {
+        displayConfirmNotification();
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 const askForNotificationPermission = () => {
@@ -78,12 +122,13 @@ const askForNotificationPermission = () => {
       // Permision granted.
       // Hide Button.
       console.log('We have lift off!');
-      displayConfirmNotification();
+      configurePushSub();
+      // displayConfirmNotification();
 
     })
 }
 
-if ('Notification' in window) {
+if ('Notification' in window && 'serviceWorker' in navigator) {
   for (let i = 0; i < enableNotificationsButtons.length; i++) {
     enableNotificationsButtons[i].style.display = 'inline-block';
     enableNotificationsButtons[i].addEventListener('click', askForNotificationPermission);

@@ -56,3 +56,19 @@ const deleteItemFromData = (st, id) => {
             console.log('indexedDB item deleted: ', id)
         })
 }
+
+//Turn Vapid Key from a Base64 string to a Uint8 Array which is what is needed to pass in the subscribe method in app.js
+function urlBase64ToUint8Array(base64String) {
+    var padding = '='.repeat((4 - base64String.length % 4) % 4);
+    var base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+  
+    var rawData = window.atob(base64);
+    var outputArray = new Uint8Array(rawData.length);
+  
+    for (var i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
